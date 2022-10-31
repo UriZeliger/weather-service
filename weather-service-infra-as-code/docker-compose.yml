@@ -1,0 +1,67 @@
+version: '3.7'
+
+services:
+  redis:
+    container_name: redis
+    image: "redis:6.0.9-alpine"
+    hostname: "redis"
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - uri-test
+
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:3.8.9-management-alpine"
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - uri-test
+
+
+  influxdb:
+    container_name: influxdb
+    image: "influxdb:2.4.0-alpine"
+    restart: unless-stopped
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=my-user
+      - DOCKER_INFLUXDB_INIT_PASSWORD=my-password
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+    ports:
+      - "8086:8086"
+    volumes:
+      - ${PWD}/influxdb:/var/lib/influxdb
+      - ${PWD}/influxdb2:/var/lib/influxdb2
+    networks:
+      - uri-test
+
+  
+  mongodb:
+    container_name: mongodb
+    image: "mongo:4.4.2"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    volumes:
+      - ${PWD}/mongodb/db:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --logpath=/dev/null --wiredTigerCacheSizeGB=2 --quiet
+    restart: unless-stopped
+    networks:
+      - uri-test
+
+
+  
+networks:
+  uri-test:
+    name: uri-test
+    driver: bridge

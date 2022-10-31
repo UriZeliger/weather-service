@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "docker-build",
+			"label": "docker-build",
+			"platform": "python",
+			"dockerBuild": {
+				"tag": "weatherservice:latest",
+				"dockerfile": "${workspaceFolder}/Dockerfile",
+				"context": "${workspaceFolder}",
+				"pull": true
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: debug",
+			"dependsOn": [
+				"docker-build"
+			],
+			"python": {
+				"file": "main.py"
+			},
+			
+			"dockerRun": {
+				"ports": [{"containerPort": 8000, "hostPort": 8000}],
+				"network": "uri-test",
+				"env": {
+					"SANIC_KEY1": "VAL1",
+					"SANIC_SKEY2": "VAL2"
+				  },
+				
+			}
+		}
+	]
+}

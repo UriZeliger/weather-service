@@ -1,0 +1,4 @@
+sanic
+sanic_openapi
+aio_pika
+injector
